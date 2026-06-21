@@ -1,0 +1,112 @@
+import sqlite3
+from pathlib import Path
+from typing import List, Optional
+from models import ParkingSlot, ParkingTicket
+
+
+class ParkingDatabase:
+    def __init__(self, db_path: str = "smart_parking.db"):
+        self.db_path = Path(db_path)
+        self.create_tables()
+        self.seed_slots()
+
+    def connect(self):
+        return sqlite3.connect(self.db_path)
+
+    def create_tables(self):
+        with self.connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS parking_slots (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    slot_name TEXT NOT NULL UNIQUE,
+                    is_occupied INTEGER DEFAULT 0
+                )
+            """)
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS parking_tickets (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    plate_number TEXT NOT NULL,
+                    slot_name TEXT NOT NULL,
+                    check_in_time TEXT NOT NULL,
+                    check_out_time TEXT,
+                    fee REAL DEFAULT 0,
+                    status TEXT DEFAULT 'Đang gửi'
+                )
+            """)
+            conn.commit()
+
+    def seed_slots(self):
+        with self.connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT COUNT(*) FROM parking_slots")
+            count = cursor.fetchone()[0]
+            if count == 0:
+                for i in range(1, 13):
+                    cursor.execute(
+                        "INSERT INTO parking_slots(slot_name, is_occupied) VALUES (?, ?)",
+                        (f"A{i:02d}", 0)
+                    )
+            conn.commit()
+
+    def get_slots(self) -> List[ParkingSlot]:
+        with self.connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT id, slot_name, is_occupied FROM parking_slots ORDER BY slot_name")
+            rows = cursor.fetchall()
+        return [ParkingSlot(row[0], row[1], bool(row[2])) for row in rows]
+
+    def find_free_slot(self) -> Optional[str]:
+        with self.connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT slot_name FROM parking_slots WHERE is_occupied = 0 ORDER BY slot_name LIMIT 1")
+            row = cursor.fetchone()
+        return row[0] if row else None
+
+    def check_in(self, plate_number: str, slot_name: str, check_in_time: str):
+        with self.connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO parking_tickets(plate_number, slot_name, check_in_time, status)
+                VALUES (?, ?, ?, 'Đang gửi')
+            """, (plate_number, slot_name, check_in_time))
+            cursor.execute("UPDATE parking_slots SET is_occupied = 1 WHERE slot_name = ?", (slot_name,))
+            conn.commit()
+
+    def get_active_ticket_by_plate(self, plate_number: str) -> Optional[ParkingTicket]:
+        with self.connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT id, plate_number, slot_name, check_in_time, check_out_time, fee, status
+                FROM parking_tickets
+                WHERE plate_number = ? AND status = 'Đang gửi'
+                ORDER BY id DESC LIMIT 1
+            """, (plate_number,))
+            row = cursor.fetchone()
+
+        if not row:
+            return None
+
+        return ParkingTicket(*row)
+
+    def check_out(self, ticket_id: int, slot_name: str, check_out_time: str, fee: float):
+        with self.connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                UPDATE parking_tickets
+                SET check_out_time = ?, fee = ?, status = 'Đã lấy xe'
+                WHERE id = ?
+            """, (check_out_time, fee, ticket_id))
+            cursor.execute("UPDATE parking_slots SET is_occupied = 0 WHERE slot_name = ?", (slot_name,))
+            conn.commit()
+
+    def get_all_tickets(self) -> List[ParkingTicket]:
+        with self.connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT id, plate_number, slot_name, check_in_time, check_out_time, fee, status
+                FROM parking_tickets
+                ORDER BY id DESC
+            """)
+            rows = cursor.fetchall()
+        return [ParkingTicket(*row) for row in rows]

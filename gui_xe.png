@@ -1,0 +1,63 @@
+# PHẦN MỀM QUẢN LÝ BÃI ĐỖ XE THÔNG MINH
+
+## 1. Giới thiệu
+
+Đề tài xây dựng phần mềm quản lý bãi đỗ xe thông minh bằng Python.  
+Phần mềm hỗ trợ quản lý vị trí trống, ghi nhận thời gian gửi xe thực tế, tính toán chi phí gửi xe và lưu dữ liệu vào cơ sở dữ liệu SQLite.
+
+## 2. Chức năng chính
+
+- Quản lý danh sách vị trí đỗ xe.
+- Kiểm tra vị trí trống và vị trí đã có xe.
+- Gửi xe vào bãi theo biển số xe.
+- Lấy xe ra khỏi bãi.
+- Tính chi phí gửi xe theo thời gian gửi thực tế.
+- Lưu lịch sử gửi xe trong cơ sở dữ liệu.
+- Hiển thị sơ đồ bãi đỗ xe và lịch sử giao dịch.
+
+## 3. Công nghệ sử dụng
+
+- Python
+- Tkinter
+- SQLite
+- Lập trình hướng đối tượng OOP
+
+## 4. Cấu trúc project
+
+```text
+K235480106077_NguyenVanTuyen_SmartParking/
+├── main.py
+├── database.py
+├── models.py
+├── requirements.txt
+├── smart_parking.db
+├── README.md
+└── screenshots/
+```
+
+## 5. Hướng dẫn chạy chương trình
+
+Bước 1: Cài đặt Python.
+
+Bước 2: Mở thư mục project bằng PyCharm hoặc VS Code.
+
+Bước 3: Chạy chương trình:
+
+```bash
+python main.py
+```
+
+Khi chạy lần đầu, chương trình sẽ tự tạo file `smart_parking.db`.
+
+## 6. Quy định tính phí
+
+- Giờ đầu: 5.000đ
+- Mỗi giờ tiếp theo: 3.000đ
+- Thời gian gửi được làm tròn lên theo giờ
+
+## 7. Sinh viên thực hiện
+
+- Họ và tên: Nguyễn Văn Tuyến
+- Lớp: K59.KMT.K01
+- MSSV: K235480106077
+- Giáo viên hướng dẫn: Nguyễn Tuấn Linh
