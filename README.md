@@ -38,7 +38,6 @@ Bước 2: Mở thư mục project bằng PyCharm hoặc VS Code.
 
 Bước 3: Cài thư viện cần thiết:
 
-```bash
 pip install -r requirements.txt
 
 Bước 4: Chạy chương trình:
