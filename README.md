@@ -43,15 +43,18 @@ pip install -r requirements.txt
 Bước 4: Chạy chương trình:
 python main.py
 
-6. Hình ảnh minh họa
+## 6. Hình ảnh minh họa
 Giao diện chính
 
 Chức năng gửi xe
 
 Chức năng lấy xe và tính tiền
 
-7. Sinh viên thực hiện
+## 7. Sinh viên thực hiện
 Họ và tên: Nguyễn Văn Tuyến
+
 Lớp: K59.KMT.K01
-Mã sinh viên: K235480106059
+
+Mã sinh viên: K235480106077
+
 Giáo viên hướng dẫn: Nguyễn Tuấn Linh
